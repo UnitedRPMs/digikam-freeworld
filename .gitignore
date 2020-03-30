@@ -1,0 +1,8 @@
+BUILD/*
+BUILDROOT/*
+RPMS/*
+SPECS/*
+SRPMS/*
+pdfsam*.zip
+.directory
+*.rpm
