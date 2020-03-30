@@ -196,11 +196,6 @@ if [ $1 -eq 0 ] ; then
   update-desktop-database -q &> /dev/null
 fi
 
-%posttrans
-gtk-update-icon-cache %{_kf5_datadir}/icons/hicolor &> /dev/null || :
-update-desktop-database -q &> /dev/null
-%endif
-
 %files -f digikam.lang
 %doc AUTHORS ChangeLog
 %doc NEWS README.md
