@@ -3,6 +3,7 @@ BUILDROOT/*
 RPMS/*
 SPECS/*
 SRPMS/*
-pdfsam*.zip
+*.zip
+*.tar.xz
 .directory
 *.rpm

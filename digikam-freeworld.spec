@@ -3,7 +3,7 @@
 Name:    digikam-freeworld
 Summary: A digital camera accessing & photo management application
 Version: 7.0.0
-Release: 0.7%{?dist}
+Release: 0.9%{?dist}
 
 License: GPLv2+
 URL:     http://www.digikam.org/
@@ -43,7 +43,7 @@ BuildRequires: pkgconfig(Qt5WebKit)
 BuildRequires: pkgconfig(x11) pkgconfig(xproto)
 %if 0%{?qt5_qtwebengine_arches:1}
 %ifarch %{?qt5_qtwebengine_arches}
-%global qwebengine -DENABLE_QWEBENGINE:BOOL=ON
+%global qwebengine -DENABLE_QWEBENGINE=ON
 BuildRequires: cmake(KF5AkonadiContact)
 BuildRequires: pkgconfig(Qt5WebEngine)
 %else
@@ -92,6 +92,8 @@ BuildRequires: pkgconfig(lqr-1)
 BuildRequires: pkgconfig(libpgf) >= 6.12.24
 # Media support enabled
 BuildRequires: qtav-devel
+BuildRequires: ffmpeg 
+BuildRequires: ffmpeg-devel
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %if 0%{?fedora} > 21
@@ -151,14 +153,14 @@ jobs=$(grep processor /proc/cpuinfo | tail -1 | grep -o '[0-9]*')
 mkdir %{_target_platform}
 pushd %{_target_platform}
 %{cmake3} -G Ninja .. \
-  -DBUILD_TESTING:BOOL=OFF \
-  -DCMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
-  -DENABLE_AKONADICONTACTSUPPORT:BOOL=ON \
-  -DENABLE_APPSTYLES:BOOL=ON \
-  -DENABLE_KFILEMETADATASUPPORT:BOOL=ON \
-  -DENABLE_MYSQLSUPPORT:BOOL=ON \
-  -DENABLE_INTERNALMYSQL:BOOL=ON \
-  -DENABLE_MEDIAPLAYER:BOOL=ON \
+  -DBUILD_TESTING=OFF \
+  -DCMAKE_VERBOSE_MAKEFILE=OFF \
+  -DENABLE_AKONADICONTACTSUPPORT=ON \
+  -DENABLE_APPSTYLES=ON \
+  -DENABLE_KFILEMETADATASUPPORT=ON \
+  -DENABLE_MYSQLSUPPORT=ON \
+  -DENABLE_INTERNALMYSQL=ON \
+  -DENABLE_MEDIAPLAYER=ON \
   %{?qwebengine} -Wno-dev 
   popd
 
@@ -239,6 +241,10 @@ fi
 
 
 %changelog
+
+* Sun Apr 05 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.9
+- Added missed build deps
+- Enabled multimedia
 
 * Thu Mar 26 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.7
 - Upstream
