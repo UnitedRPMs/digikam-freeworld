@@ -3,7 +3,7 @@
 Name:    digikam-freeworld
 Summary: A digital camera accessing & photo management application
 Version: 7.0.0
-Release: 0.9%{?dist}
+Release: 0.10%{?dist}
 
 License: GPLv2+
 URL:     http://www.digikam.org/
@@ -80,7 +80,7 @@ BuildRequires: expat-devel
 ## htmlexport plugin
 BuildRequires: pkgconfig(libxslt)
 ## RemoveRedeye
-BuildRequires: pkgconfig(opencv) >= 3.1
+BuildRequires: pkgconfig(opencv) >= 4.3.0
 BuildRequires: opencv-static
 # Panorama plugin requires flex and bison
 BuildRequires: flex
@@ -241,6 +241,9 @@ fi
 
 
 %changelog
+
+* Mon Apr 27 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.10
+- Rebuilt for opencv
 
 * Sun Apr 05 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.9
 - Added missed build deps
