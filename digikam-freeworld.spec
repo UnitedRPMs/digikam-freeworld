@@ -1,19 +1,21 @@
 %define _legacy_common_support 1
+%global debug_package %{nil}
 
 Name:    digikam-freeworld
 Summary: A digital camera accessing & photo management application
 Version: 7.0.0
-Release: 0.10%{?dist}
+Release: 0.11%{?dist}
 
 License: GPLv2+
 URL:     http://www.digikam.org/
-Source0: https://download.kde.org/unstable/digikam/digikam-%{version}-beta2.tar.xz
+Source0: https://download.kde.org/unstable/digikam/digikam-%{version}-rc.tar.xz
 
 # digiKam not listed as a media handler for pictures in Nautilus (#516447)
 # TODO: upstream me
 Source10: digikam-import.desktop
 
 BuildRequires: ninja-build
+BuildRequires: git
 BuildRequires: boost-devel
 BuildRequires: eigen3-devel
 BuildRequires: desktop-file-utils
@@ -144,33 +146,39 @@ Conflicts: digikam-doc
 
 
 %prep
-%autosetup -n digikam-%{version}-beta2 -p1
+%autosetup -n digikam-%{version}-rc -p1
 
 %build
 # SUPER POWER!
 jobs=$(grep processor /proc/cpuinfo | tail -1 | grep -o '[0-9]*')
 
-mkdir %{_target_platform}
-pushd %{_target_platform}
-%{cmake3} -G Ninja .. \
-  -DBUILD_TESTING=OFF \
-  -DCMAKE_VERBOSE_MAKEFILE=OFF \
-  -DENABLE_AKONADICONTACTSUPPORT=ON \
-  -DENABLE_APPSTYLES=ON \
-  -DENABLE_KFILEMETADATASUPPORT=ON \
-  -DENABLE_MYSQLSUPPORT=ON \
-  -DENABLE_INTERNALMYSQL=ON \
-  -DENABLE_MEDIAPLAYER=ON \
-  %{?qwebengine} -Wno-dev 
-  popd
+mkdir -p build; cd build
 
-%ninja_build -C %{_target_platform}  -j$jobs
+cmake	-DCMAKE_INSTALL_PREFIX="/usr" \
+	-DCMAKE_INSTALL_LIBDIR=%{_libdir} \
+	-DCMAKE_INSTALL_MANDIR:PATH=%{_mandir} \
+	-G Ninja \
+	-DBUILD_TESTING=OFF \
+	-DDIGIKAMSC_COMPILE_PO=ON \
+  	-DCMAKE_VERBOSE_MAKEFILE=OFF \
+  	-DENABLE_AKONADICONTACTSUPPORT=ON \
+  	-DENABLE_APPSTYLES=ON \
+  	-DENABLE_KFILEMETADATASUPPORT=ON \
+  	-DENABLE_MYSQLSUPPORT=ON \
+  	-DENABLE_INTERNALMYSQL=ON \
+  	-DENABLE_MEDIAPLAYER=ON \
+  	%{?qwebengine} -Wno-dev .. || exit 1
+  
+%ninja_build  -j$jobs
 
 
 %install
-%ninja_install -C %{_target_platform} 
+DESTDIR=%{buildroot} cmake --install build 
 
+# FIXME
+DESTDIR=%{buildroot} cmake --install build/po
 
+ 
 
 desktop-file-install --vendor="" \
   --dir=%{buildroot}%{_datadir}/applications/ \
@@ -198,7 +206,9 @@ if [ $1 -eq 0 ] ; then
   update-desktop-database -q &> /dev/null
 fi
 
-%files -f digikam.lang
+%files 
+#fixme
+#-f digikam.lang
 %doc AUTHORS ChangeLog
 %doc NEWS README.md
 %license COPYING
@@ -241,6 +251,9 @@ fi
 
 
 %changelog
+
+* Thu Aug 27 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.11
+- Updated to rc 
 
 * Mon Apr 27 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.10
 - Rebuilt for opencv
