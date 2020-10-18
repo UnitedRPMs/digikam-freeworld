@@ -3,18 +3,17 @@
 
 Name:    digikam-freeworld
 Summary: A digital camera accessing & photo management application
-Version: 7.0.0
-Release: 0.11%{?dist}
+Version: 7.1.0
+Release: 7%{?dist}
 
 License: GPLv2+
 URL:     http://www.digikam.org/
-Source0: https://download.kde.org/unstable/digikam/digikam-%{version}-rc.tar.xz
+Source0: https://download.kde.org/stable/digikam/%{version}/digikam-%{version}.tar.xz
 
 # digiKam not listed as a media handler for pictures in Nautilus (#516447)
 # TODO: upstream me
 Source10: digikam-import.desktop
 
-BuildRequires: ninja-build
 BuildRequires: git
 BuildRequires: boost-devel
 BuildRequires: eigen3-devel
@@ -146,18 +145,16 @@ Conflicts: digikam-doc
 
 
 %prep
-%autosetup -n digikam-%{version}-rc -p1
+%autosetup -n digikam-%{version} -p1 
 
 %build
 # SUPER POWER!
 jobs=$(grep processor /proc/cpuinfo | tail -1 | grep -o '[0-9]*')
 
-mkdir -p build; cd build
+mkdir -p %{_target_platform}
 
-cmake	-DCMAKE_INSTALL_PREFIX="/usr" \
-	-DCMAKE_INSTALL_LIBDIR=%{_libdir} \
-	-DCMAKE_INSTALL_MANDIR:PATH=%{_mandir} \
-	-G Ninja \
+%cmake	\
+	-B %{_target_platform} \
 	-DBUILD_TESTING=OFF \
 	-DDIGIKAMSC_COMPILE_PO=ON \
   	-DCMAKE_VERBOSE_MAKEFILE=OFF \
@@ -167,18 +164,14 @@ cmake	-DCMAKE_INSTALL_PREFIX="/usr" \
   	-DENABLE_MYSQLSUPPORT=ON \
   	-DENABLE_INTERNALMYSQL=ON \
   	-DENABLE_MEDIAPLAYER=ON \
-  	%{?qwebengine} -Wno-dev .. || exit 1
+  	%{?qwebengine} -Wno-dev || exit 1
   
-%ninja_build  -j$jobs
+cmake --build %{_target_platform} -j$jobs 
 
 
 %install
-DESTDIR=%{buildroot} cmake --install build 
+DESTDIR=%{buildroot} cmake --install %{_target_platform}
 
-# FIXME
-DESTDIR=%{buildroot} cmake --install build/po
-
- 
 
 desktop-file-install --vendor="" \
   --dir=%{buildroot}%{_datadir}/applications/ \
@@ -206,9 +199,7 @@ if [ $1 -eq 0 ] ; then
   update-desktop-database -q &> /dev/null
 fi
 
-%files 
-#fixme
-#-f digikam.lang
+%files -f digikam.lang
 %doc AUTHORS ChangeLog
 %doc NEWS README.md
 %license COPYING
@@ -251,6 +242,9 @@ fi
 
 
 %changelog
+
+* Mon Oct 12 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.1.0-7
+- Updated to 7.1.0-7
 
 * Thu Aug 27 2020 Unitedrpms Project <unitedrpms AT protonmail DOT com> 7.0.0-0.11
 - Updated to rc 
